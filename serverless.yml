@@ -1,0 +1,1008 @@
+service: commonApp
+
+custom:
+  serverless-offline:
+    apiKey: FUNPXVdIK11wZ1APJpPsD9nk9eTNY9XhwBpY9289
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+  tablePrefix:
+    dev: DEVELOP
+    release: RELEASE
+    prod: PROD
+  stageVariables:
+    environment: ${self:custom.stage}
+    version: ${self:custom.stage}    
+
+plugins:
+      - serverless-offline    
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  versionFunctions: false
+  region:  us-east-1
+  iamRoleStatements:
+   - Effect: "Allow"
+     Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+     Resource:
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.USERS"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PRODUCT_OFFERING"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PRODUCT_OFFERING_TEMPLATE"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.OTP"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.ORDER"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PROVIDER_ORDERS"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.USERS/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PRODUCT_OFFERING/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.OTP/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.ORDER/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PROVIDER_ORDERS/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PRODUCT_OFFERING_TEMPLATE/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PAYMENT"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.PAYMENT/index/*"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.REFERRAL_EARNING"
+      - "arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.tablePrefix.${self:custom.stage}}.REFERRAL_EARNING/index/*"
+   - Effect: "Allow"
+     Action:
+        - s3:PutObject
+        - s3:GetObject
+     Resource:
+       - "arn:aws:s3:::foodapp-upload/*"
+
+functions:
+  createUser:
+    handler: handler.registerUser
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /registerUser
+          method: post
+          cors: true
+          private: true
+      
+  getUserByPhoneNumer:
+    handler: handler.getUserByPhoneNumber
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /users/{phoneNumber}
+        method: get
+        cors: true
+        private: true
+     
+  updateUser:
+    handler: handler.updateUser
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /user/{userId}
+        method: put
+        cors: true
+        private: true
+  
+  updateUserType:
+    handler: handler.updateUserType
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /userType/{userId}
+        method: put
+        cors: true
+        private: true
+    
+  joinProvider:
+    handler: handler.joinProvider
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /joinProvider/{userId}
+          method: put
+          cors: true
+          private: true
+    
+  checkIfWithInRange:
+    handler: handler.checkIfWithInRange
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /checkIfWithInRange
+          method: post
+          cors: true
+          private: true
+      
+  sendOTP:
+    handler: otp/otpOperation.sendOTP
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /send_otp
+        method: post
+        cors: true 
+        private: true
+     
+    
+  loginUser:
+    handler: handler.loginUser
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /login
+        method: post
+        cors: true
+        private: true
+  getAllProviders:
+    handler: handler.getAllProviders
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /getAllProviders
+        method: get
+        cors: true
+        private: true
+  getUsersByTypeAndStatus:
+    handler: handler.getUsersByTypeAndStatus
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /getUsersByTypeAndStatus/{userType}/{userStatus}
+          method: get
+          cors: true
+          private: true
+  addOffering:
+    handler: offering.addOffering
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /addOffering
+        method: post
+        cors: true
+        private: true
+  updateOffering:
+    handler: offering.updateOffering
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /updateOffering/{productOfferingId}
+        method: post
+        cors: true
+        private: true
+  getOffering:
+    handler: offering.getOffering
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /getOffering/{productOfferingId}
+          method: get
+          cors: true
+          private: true
+  getOfferingByUserId:
+    handler: offering.getOfferingByUserId
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /getUserOfferings/{userId}
+        method: get
+        cors: true
+        private: true
+  getOfferingTemplatesForProvider:
+    handler: offering.getTemplatesByProvider
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /offering/getProviderOfferingTemplates/{providerId}
+          method: get
+          cors: true
+          private: true
+  createOrder:
+    handler: orderOperation.createOrder
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /order/
+        method: post
+        cors: true
+        private: true
+  payment:
+    handler: orderOperation.checkPayment
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /capturePayment/
+        method: post
+        cors: true
+        private: true
+  fetchPaymentforOrder:
+    handler: orderOperation.fetchPaymentsforOrder
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /payments/{orderId}
+        method: get
+        cors: true
+        private: true
+  # fetchPaymentbyPaymentId:
+  #   handler: orderOperation.fetchPaymentById
+  #   events:
+  #   - http:
+  #       path: /payment/{paymentId}
+  #       method: get
+  #       cors: true
+  #       private: true
+  webhookNotification:
+    handler: orderOperation.webhookNotification
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /webhook/
+        method: post
+        cors: true
+  capturePayment:
+    handler: orderOperation.capturePayment
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /capturePayment/{paymentId}
+        method: post  
+        cors: true
+        private: true
+  updateOrder:
+    handler: order/order.updateOrder
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /order/updateOrder/{orderId}
+          method: put
+          cors: true
+          private: true
+  getProviderOrders:
+    handler: order/order.getOrderByUsertype
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /order/getOrderByUsertype/{userType}
+          method: put
+          cors: true
+          private: true
+  getOrderById:
+    handler: order/order.getOrderById
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /order/{orderId}
+          method: get
+          cors: true
+          private: true
+  getByUserOrderId:
+    handler: order/order.getUserOrderByUserOrderId
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /order/userOrderId/{userOrderId}
+          method: post
+          cors: true
+          private: true
+  getObjectPresignedUrl:
+    handler: s3PresignedUrls.getObjectUrl
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+      - http:
+          path: /s3/getPresignedUrl/
+          method: post
+          cors: true
+          private: true
+  ProviderOrdersList:
+    handler: order/order.getProviderOrderList
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: order/providerorderlist/{providerId}
+        method: get
+        cors: true
+        private: true
+  DeleteUserByPhoneNumber:
+    handler: handler.deleteUserByPhoneNumber
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: deleteuser/{phoneNumber}
+        method: delete
+        cors: true     
+        private: true 
+  # getAllOrders:
+  #   handler: order/order.getAllOrdersAndEarning
+  #   events:
+  #   - http:
+  #       path: order/allorders
+  #       method: get
+  #       cors: true 
+  #       private: true       
+  getAllCommission:
+    handler: handler.getCommission
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /commission
+        method: put
+        cors: true
+        private: true
+
+resources:
+  Resources:
+    Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET, PUT]
+              AllowedOrigins: ['*']
+              Id: CORSRuleId1
+              MaxAge: '3600'
+    
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: phoneNumber
+          AttributeType: S
+        - AttributeName: userStatus
+          AttributeType: S
+        - AttributeName: userType
+          AttributeType: S
+        - AttributeName: referredById
+          AttributeType: S
+        - AttributeName: referralCode
+          AttributeType: S
+        - AttributeName: appId
+          AttributeType: S
+        KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes: 
+          - 
+            IndexName: "phoneNumber-Index"
+            KeySchema: 
+              - 
+                AttributeName: "phoneNumber"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput: 
+             ReadCapacityUnits: 5
+             WriteCapacityUnits: 1
+          - 
+            IndexName: "userStatus-Index"
+            KeySchema: 
+              - 
+                AttributeName: "userStatus"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput: 
+             ReadCapacityUnits: 5
+             WriteCapacityUnits: 1
+          - 
+            IndexName: "userType-Index"
+            KeySchema: 
+              - 
+                AttributeName: "userType"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput: 
+             ReadCapacityUnits: 5
+             WriteCapacityUnits: 1
+          - IndexName: "referredById-index"
+            KeySchema:
+              - AttributeName: "referredById"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "referralCode-index"
+            KeySchema:
+              - AttributeName: "referralCode"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName: ${self:custom.tablePrefix.${self:custom.stage}}.USERS
+      
+    ProductOfferingsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "productOfferingId"
+            AttributeType: "S"
+          - AttributeName: "userId"
+            AttributeType: "S"
+          - AttributeName: "productName"
+            AttributeType: "S"
+          - AttributeName: "productStatus"
+            AttributeType: "S"
+          - AttributeName: "pickUpLocationId"
+            AttributeType: "S"  
+          - AttributeName: "appId"
+            AttributeType: "S"      
+        KeySchema:
+          - AttributeName: "productOfferingId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes: 
+          - 
+            IndexName: "userId-productName-index"
+            KeySchema: 
+              - 
+                AttributeName: "userId"
+                KeyType: "HASH"
+              - 
+                AttributeName: "productName"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - 
+            IndexName: "productStatus-index"
+            KeySchema: 
+              - 
+                AttributeName: "productStatus"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - 
+            IndexName: "pickUpLocationId-index"
+            KeySchema: 
+              - 
+                AttributeName: "pickUpLocationId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1      
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1     
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.PRODUCT_OFFERING
+
+    OTPTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "phoneNumber"
+            AttributeType: "S"
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "phoneNumber"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.OTP
+
+    ORDERTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "orderId"
+            AttributeType: "S"
+          - AttributeName: "userId"
+            AttributeType: "S"
+          - AttributeName: "userOrderId"
+            AttributeType: "S"
+          - AttributeName: "orderStatus"
+            AttributeType: "S"
+          - AttributeName: "razorpayOrderId"
+            AttributeType: "S"
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "orderId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: "orderId-userId-index"
+            KeySchema:
+              - AttributeName: "orderId"
+                KeyType: "HASH"
+              - AttributeName: "userId"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "orderId-orderStatus-index"
+            KeySchema:
+              - AttributeName: "orderId"
+                KeyType: "HASH"
+              - AttributeName: "orderStatus"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "userId-orderStatus-index"
+            KeySchema:
+              - AttributeName: "userId"
+                KeyType: "HASH"
+              - AttributeName: "orderStatus"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "userId-index"
+            KeySchema:
+              - AttributeName: "userId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "orderStatus-index"
+            KeySchema:
+              - AttributeName: "orderStatus"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "razorpayOrderId-index"
+            KeySchema:
+              - AttributeName: "razorpayOrderId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "userOrderId-index"
+            KeySchema:
+              - AttributeName: "userOrderId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 1
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.ORDER
+
+    ProviderOrderTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "providerId"
+            AttributeType: "S"
+          - AttributeName: "orderId"
+            AttributeType: "S"
+          - AttributeName: "userOrderId"
+            AttributeType: "S"  
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "orderId"
+            KeyType: "HASH"
+          - AttributeName: "providerId"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes: 
+          - 
+            IndexName: "providerId-index"
+            KeySchema: 
+              - 
+                AttributeName: "providerId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+              
+          - 
+            IndexName: "userOrderId-index"
+            KeySchema: 
+              - 
+                AttributeName: "userOrderId"
+                KeyType: "HASH"
+              - 
+                AttributeName: "providerId"
+                KeyType: "RANGE"  
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1 
+          - 
+            IndexName: "orderId-index"
+            KeySchema:
+              - AttributeName: "orderId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1       
+          - 
+            IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.PROVIDER_ORDERS
+
+    PaymentTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "paymentId"
+            AttributeType: "S"
+          - AttributeName: "userId"
+            AttributeType: "S"
+          - AttributeName: "razorPayPaymentId"
+            AttributeType: "S"
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "paymentId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes: 
+          - 
+            IndexName: "paymentId-index"
+            KeySchema: 
+              - 
+                AttributeName: "paymentId"
+                KeyType: "HASH"
+              
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - 
+            IndexName: "razorPayPaymentId-index"
+            KeySchema: 
+              - 
+                AttributeName: "razorPayPaymentId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - 
+            IndexName: "userId-index"
+            KeySchema: 
+              - 
+                AttributeName: "userId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1          
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1 
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.PAYMENT
+
+    ProductOfferingsTemplateTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "productOfferTemplateId"
+            AttributeType: "S"
+          - AttributeName: "providerId"
+            AttributeType: "S"
+          - AttributeName: "productOfferingId"
+            AttributeType: "S"
+          - AttributeName: "productName"
+            AttributeType: "S"
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "productOfferTemplateId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes: 
+          - 
+            IndexName: "providerId-index"
+            KeySchema: 
+              - 
+                AttributeName: "providerId"
+                KeyType: "HASH"
+              
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - 
+            IndexName: "productOfferingId-index"
+            KeySchema: 
+              - 
+                AttributeName: "productOfferingId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - 
+            IndexName: "productName-index"
+            KeySchema: 
+              - 
+                AttributeName: "productName"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL" 
+            ProvisionedThroughput: 
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.PRODUCT_OFFERING_TEMPLATE
+
+    REFERRALEARNINGTABLE:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "referralEarningId"
+            AttributeType: "S"
+          - AttributeName: "userId"
+            AttributeType: "S"
+          - AttributeName: "orderId"
+            AttributeType: "S"
+          - AttributeName: "commissionDate"
+            AttributeType: "S"
+          - AttributeName: "commissionForUserId"
+            AttributeType: "S"
+          - AttributeName: "commissionForUserType"
+            AttributeType: "S"
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "referralEarningId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: "userId-index"
+            KeySchema:
+              - AttributeName: "userId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "commissionDate-userId-index"
+            KeySchema:
+              - AttributeName: "userId"
+                KeyType: "HASH"
+              - AttributeName: "commissionDate"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "userId-index"
+            KeySchema:
+              - AttributeName: "userId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "commissionForUserId-commissionForUserType-index"
+            KeySchema:
+              - AttributeName: "commissionForUserId"
+                KeyType: "HASH"
+              - AttributeName: "commissionForUserType"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "orderId-index"
+            KeySchema:
+              - AttributeName: "orderId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.REFERRAL_EARNING
+
+    ORDEREARNINGTABLE:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "orderEarningId"
+            AttributeType: "S"
+          - AttributeName: "providerId"
+            AttributeType: "S"
+          - AttributeName: "orderId"
+            AttributeType: "S"
+          - AttributeName: "paidDate"
+            AttributeType: "S"
+          - AttributeName: "totalEarning"
+            AttributeType: "S"
+          - AttributeName: "totalPaid"
+            AttributeType: "S"
+          - AttributeName: "appId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "orderEarningId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: "providerId-index"
+            KeySchema:
+              - AttributeName: "providerId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "providerId-orderId-index"
+            KeySchema:
+              - AttributeName: "providerId"
+                KeyType: "HASH"
+              - AttributeName: "orderId"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "paidDate-index"
+            KeySchema:
+              - AttributeName: "paidDate"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "totalEarning-index"
+            KeySchema:
+              - AttributeName: "totalEarning"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "totalPaid-index"
+            KeySchema:
+              - AttributeName: "totalPaid"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "orderId-index"
+            KeySchema:
+              - AttributeName: "orderId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+          - IndexName: "appId-index"
+            KeySchema:
+              - AttributeName: "appId"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 1
+        TableName:  ${self:custom.tablePrefix.${self:custom.stage}}.ORDER_EARNING
