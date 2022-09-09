@@ -56,6 +56,22 @@ provider:
        - "arn:aws:s3:::foodapp-upload/*"
 
 functions:
+  listUsers:
+    handler: handler.listUser
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /api/listUser
+        method: get
+      
+  singleUser:
+    handler: handler.singleUser
+    environment: ${file(env.yml):${self:custom.stage}}
+    events:
+    - http:
+        path: /api/singleUser/{id}
+        method: get
+     
   createUser:
     handler: handler.registerUser
     environment: ${file(env.yml):${self:custom.stage}}

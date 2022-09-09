@@ -112,6 +112,18 @@
               }
             }
           },
+          "ListUsersLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/commonApp-prod-listUsers"
+            }
+          },
+          "SingleUserLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/commonApp-prod-singleUser"
+            }
+          },
           "CreateUserLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
@@ -363,6 +375,92 @@
               }
             }
           },
+          "ListUsersLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
+              },
+              "FunctionName": "commonApp-prod-listUsers",
+              "Handler": "handler.listUser",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs12.x",
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "SERVICE": "commonApp",
+                  "STAGE": "prod",
+                  "REGION": "us-east-1",
+                  "OTP_DB_NAME": "PROD.OTP",
+                  "USERS_TABLE": "PROD.USERS",
+                  "PRODUCT_OFFERING_TABLE": "PROD.PRODUCT_OFFERING",
+                  "OTP_TABLE": "PROD.OTP",
+                  "ORDER_TABLE": "PROD.ORDER",
+                  "PAYMENT_TABLE": "PROD.PAYMENT",
+                  "PROVIDER_ORDERS_TABLE": "PROD.PROVIDER_ORDERS",
+                  "PRODUCT_OFFERING_TEMPLATE_TABLE": "PROD.PRODUCT_OFFERING_TEMPLATE",
+                  "REFERRAL_EARNING_TABLE": "PROD.REFERRAL_EARNING",
+                  "ORDER_EARNING_TABLE": "PROD.ORDER_EARNING",
+                  "LOG_LEVEL": "info"
+                }
+              }
+            },
+            "DependsOn": [
+              "ListUsersLogGroup"
+            ]
+          },
+          "SingleUserLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
+              },
+              "FunctionName": "commonApp-prod-singleUser",
+              "Handler": "handler.singleUser",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs12.x",
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "SERVICE": "commonApp",
+                  "STAGE": "prod",
+                  "REGION": "us-east-1",
+                  "OTP_DB_NAME": "PROD.OTP",
+                  "USERS_TABLE": "PROD.USERS",
+                  "PRODUCT_OFFERING_TABLE": "PROD.PRODUCT_OFFERING",
+                  "OTP_TABLE": "PROD.OTP",
+                  "ORDER_TABLE": "PROD.ORDER",
+                  "PAYMENT_TABLE": "PROD.PAYMENT",
+                  "PROVIDER_ORDERS_TABLE": "PROD.PROVIDER_ORDERS",
+                  "PRODUCT_OFFERING_TEMPLATE_TABLE": "PROD.PRODUCT_OFFERING_TEMPLATE",
+                  "REFERRAL_EARNING_TABLE": "PROD.REFERRAL_EARNING",
+                  "ORDER_EARNING_TABLE": "PROD.ORDER_EARNING",
+                  "LOG_LEVEL": "info"
+                }
+              }
+            },
+            "DependsOn": [
+              "SingleUserLogGroup"
+            ]
+          },
           "CreateUserLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
@@ -370,7 +468,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-createUser",
               "Handler": "handler.registerUser",
@@ -413,7 +511,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getUserByPhoneNumer",
               "Handler": "handler.getUserByPhoneNumber",
@@ -456,7 +554,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-updateUser",
               "Handler": "handler.updateUser",
@@ -499,7 +597,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-updateUserType",
               "Handler": "handler.updateUserType",
@@ -542,7 +640,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-joinProvider",
               "Handler": "handler.joinProvider",
@@ -585,7 +683,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-checkIfWithInRange",
               "Handler": "handler.checkIfWithInRange",
@@ -628,7 +726,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-sendOTP",
               "Handler": "otp/otpOperation.sendOTP",
@@ -671,7 +769,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-loginUser",
               "Handler": "handler.loginUser",
@@ -714,7 +812,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getAllProviders",
               "Handler": "handler.getAllProviders",
@@ -757,7 +855,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getUsersByTypeAndStatus",
               "Handler": "handler.getUsersByTypeAndStatus",
@@ -800,7 +898,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-addOffering",
               "Handler": "offering.addOffering",
@@ -843,7 +941,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-updateOffering",
               "Handler": "offering.updateOffering",
@@ -886,7 +984,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getOffering",
               "Handler": "offering.getOffering",
@@ -929,7 +1027,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getOfferingByUserId",
               "Handler": "offering.getOfferingByUserId",
@@ -972,7 +1070,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getOfferingTemplatesForProvider",
               "Handler": "offering.getTemplatesByProvider",
@@ -1015,7 +1113,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-createOrder",
               "Handler": "orderOperation.createOrder",
@@ -1058,7 +1156,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-payment",
               "Handler": "orderOperation.checkPayment",
@@ -1101,7 +1199,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-fetchPaymentforOrder",
               "Handler": "orderOperation.fetchPaymentsforOrder",
@@ -1144,7 +1242,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-webhookNotification",
               "Handler": "orderOperation.webhookNotification",
@@ -1187,7 +1285,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-capturePayment",
               "Handler": "orderOperation.capturePayment",
@@ -1230,7 +1328,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-updateOrder",
               "Handler": "order/order.updateOrder",
@@ -1273,7 +1371,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getProviderOrders",
               "Handler": "order/order.getOrderByUsertype",
@@ -1316,7 +1414,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getOrderById",
               "Handler": "order/order.getOrderById",
@@ -1359,7 +1457,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getByUserOrderId",
               "Handler": "order/order.getUserOrderByUserOrderId",
@@ -1402,7 +1500,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getObjectPresignedUrl",
               "Handler": "s3PresignedUrls.getObjectUrl",
@@ -1445,7 +1543,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-ProviderOrdersList",
               "Handler": "order/order.getProviderOrderList",
@@ -1488,7 +1586,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-DeleteUserByPhoneNumber",
               "Handler": "handler.deleteUserByPhoneNumber",
@@ -1531,7 +1629,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z/commonApp.zip"
+                "S3Key": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z/commonApp.zip"
               },
               "FunctionName": "commonApp-prod-getAllCommission",
               "Handler": "handler.getCommission",
@@ -1577,6 +1675,57 @@
                 ]
               },
               "Policy": ""
+            }
+          },
+          "ApiGatewayResourceApi": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "api",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceApiListuser": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceApi"
+              },
+              "PathPart": "listUser",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceApiSingleuser": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceApi"
+              },
+              "PathPart": "singleUser",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceApiSingleuserIdVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceApiSingleuser"
+              },
+              "PathPart": "{id}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
             }
           },
           "ApiGatewayResourceRegisteruser": {
@@ -3457,6 +3606,92 @@
               }
             }
           },
+          "ApiGatewayMethodApiListuserGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceApiListuser"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "ListUsersLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodApiSingleuserIdVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceApiSingleuserIdVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "SingleUserLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
           "ApiGatewayMethodRegisteruserPost": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
@@ -4661,7 +4896,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1658163626854": {
+          "ApiGatewayDeployment1662108553642": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -4698,6 +4933,8 @@
               "ApiGatewayMethodOrderProviderorderlistProvideridVarOptions",
               "ApiGatewayMethodDeleteuserPhonenumberVarOptions",
               "ApiGatewayMethodCommissionOptions",
+              "ApiGatewayMethodApiListuserGet",
+              "ApiGatewayMethodApiSingleuserIdVarGet",
               "ApiGatewayMethodRegisteruserPost",
               "ApiGatewayMethodUsersPhonenumberVarGet",
               "ApiGatewayMethodUserUseridVarPut",
@@ -4727,6 +4964,80 @@
               "ApiGatewayMethodDeleteuserPhonenumberVarDelete",
               "ApiGatewayMethodCommissionPut"
             ]
+          },
+          "ListUsersLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ListUsersLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "SingleUserLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "SingleUserLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
           },
           "CreateUserLambdaPermissionApiGateway": {
             "Type": "AWS::Lambda::Permission",
@@ -7021,6 +7332,74 @@
     ],
     "pluginsData": {},
     "functions": {
+      "listUsers": {
+        "handler": "handler.listUser",
+        "environment": {
+          "SERVICE": "commonApp",
+          "STAGE": "prod",
+          "REGION": "us-east-1",
+          "OTP_DB_NAME": "PROD.OTP",
+          "USERS_TABLE": "PROD.USERS",
+          "PRODUCT_OFFERING_TABLE": "PROD.PRODUCT_OFFERING",
+          "OTP_TABLE": "PROD.OTP",
+          "ORDER_TABLE": "PROD.ORDER",
+          "PAYMENT_TABLE": "PROD.PAYMENT",
+          "PROVIDER_ORDERS_TABLE": "PROD.PROVIDER_ORDERS",
+          "PRODUCT_OFFERING_TEMPLATE_TABLE": "PROD.PRODUCT_OFFERING_TEMPLATE",
+          "REFERRAL_EARNING_TABLE": "PROD.REFERRAL_EARNING",
+          "ORDER_EARNING_TABLE": "PROD.ORDER_EARNING",
+          "LOG_LEVEL": "info"
+        },
+        "events": [
+          {
+            "http": {
+              "path": "api/listUser",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "commonApp-prod-listUsers",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs12.x",
+        "vpc": {}
+      },
+      "singleUser": {
+        "handler": "handler.singleUser",
+        "environment": {
+          "SERVICE": "commonApp",
+          "STAGE": "prod",
+          "REGION": "us-east-1",
+          "OTP_DB_NAME": "PROD.OTP",
+          "USERS_TABLE": "PROD.USERS",
+          "PRODUCT_OFFERING_TABLE": "PROD.PRODUCT_OFFERING",
+          "OTP_TABLE": "PROD.OTP",
+          "ORDER_TABLE": "PROD.ORDER",
+          "PAYMENT_TABLE": "PROD.PAYMENT",
+          "PROVIDER_ORDERS_TABLE": "PROD.PROVIDER_ORDERS",
+          "PRODUCT_OFFERING_TEMPLATE_TABLE": "PROD.PRODUCT_OFFERING_TEMPLATE",
+          "REFERRAL_EARNING_TABLE": "PROD.REFERRAL_EARNING",
+          "ORDER_EARNING_TABLE": "PROD.ORDER_EARNING",
+          "LOG_LEVEL": "info"
+        },
+        "events": [
+          {
+            "http": {
+              "path": "api/singleUser/{id}",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "commonApp-prod-singleUser",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs12.x",
+        "vpc": {}
+      },
       "createUser": {
         "handler": "handler.registerUser",
         "environment": {
@@ -9679,7 +10058,7 @@
     "artifact": "D:\\new commerce\\ECommerce_BE\\.serverless\\commonApp.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/commonApp/prod/1658163648101-2022-07-18T17:00:48.101Z",
+    "artifactDirectoryName": "serverless/commonApp/prod/1662108572909-2022-09-02T08:49:32.909Z",
     "artifact": "commonApp.zip"
   }
 }

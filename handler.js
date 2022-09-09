@@ -5,6 +5,7 @@ const { createResponse, isPhoneNumberValid, randomString, arePointsInRange } = r
 const { verifyOTP } = require('./otp/otpOperation');
 const referralEarnings = require('./order/referralEarnings');
 const orderEarnings = require('./order/orderEarnings');
+const axios = require("axios");
 //let userToValidate;
 
 
@@ -492,6 +493,7 @@ module.exports.getAllProviders = async (event, context) => {
 }
 
 module.exports.getUsersByTypeAndStatus = async (event, context) => {
+  
   let reqBody = JSON.parse(event.body);
   let { userType, userStatus } = event.pathParameters;
   let {appId} = event.queryStringParameters || {};
@@ -735,5 +737,80 @@ module.exports.getCommission = async (event, context) => {
   } else if (reqBody.reqType === "getAllChefsEarningDetails") {
     return orderEarnings.getAllChefsEarningDetails(event);
   }
+}
+
+const reqresData= {
+  "page": 2,
+  "per_page": 6,
+  "total": 12,
+  "total_pages": 2,
+  "data": [
+      {
+          "id": 7,
+          "email": "michael.lawson@reqres.in",
+          "first_name": "Michael",
+          "last_name": "Lawson",
+          "avatar": "https://reqres.in/img/faces/7-image.jpg"
+      },
+      {
+          "id": 8,
+          "email": "lindsay.ferguson@reqres.in",
+          "first_name": "Lindsay",
+          "last_name": "Ferguson",
+          "avatar": "https://reqres.in/img/faces/8-image.jpg"
+      },
+      {
+          "id": 9,
+          "email": "tobias.funke@reqres.in",
+          "first_name": "Tobias",
+          "last_name": "Funke",
+          "avatar": "https://reqres.in/img/faces/9-image.jpg"
+      },
+      {
+          "id": 10,
+          "email": "byron.fields@reqres.in",
+          "first_name": "Byron",
+          "last_name": "Fields",
+          "avatar": "https://reqres.in/img/faces/10-image.jpg"
+      },
+      {
+          "id": 11,
+          "email": "george.edwards@reqres.in",
+          "first_name": "George",
+          "last_name": "Edwards",
+          "avatar": "https://reqres.in/img/faces/11-image.jpg"
+      },
+      {
+          "id": 12,
+          "email": "rachel.howell@reqres.in",
+          "first_name": "Rachel",
+          "last_name": "Howell",
+          "avatar": "https://reqres.in/img/faces/12-image.jpg"
+      }
+  ],
+  "support": {
+      "url": "https://reqres.in/#support-heading",
+      "text": "To keep ReqRes free, contributions towards server costs are appreciated!"
+  }
+}
+
+module.exports.listUser = async(event) =>{
+  /* const response = await axios.get("https://reqres.in/api/users?page=2") */
+  return createResponse(200,reqresData);
+
+}
+
+module.exports.singleUser = async(event) =>{
+  let {id} = event.pathParameters;
+  if(!id){
+    return createResponse(400,{message:"Id not found"});
+  }
+  id = Number(id);
+  const response = reqresData.data;
+  const data = response.find(x=>x.id===id);
+  if(data===undefined){
+    return createResponse(400,{message:"Data not found with given id"});
+  }
+  return createResponse(200,{data:data,support:reqresData.support});
 }
 

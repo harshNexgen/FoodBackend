@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const dynamodb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+const dynamodb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10'});
 const { USERS_TABLE, PRODUCT_OFFERING_TABLE, OTP_TABLE, ORDER_TABLE, PAYMENT_TABLE, PROVIDER_ORDERS_TABLE, PRODUCT_OFFERING_TEMPLATE_TABLE, REFERRAL_EARNING_TABLE } = process.env;
 const saveUser = profile => {
     const params = {
@@ -93,9 +93,9 @@ const findUsersByType = (userType , appId) => {
 const findUsersByTypeAndStatus = (userType,userStatus,appId) => {
     let queryParams = {
         TableName : USERS_TABLE,
-        IndexName: 'userStatus-Index',
-        KeyConditionExpression: 'userStatus = :userStatus',
-        FilterExpression : 'begins_with(userType, :userType) and appId = :appId ',
+        IndexName: 'userStatus-userType-index',
+        KeyConditionExpression: 'userStatus = :userStatus AND userType = :userType',
+        FilterExpression : 'appId = :appId ',
         ExpressionAttributeValues: {
             ":userType": userType,
             ":userStatus":userStatus,
